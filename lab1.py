@@ -26,90 +26,86 @@ def getDatos(info,rate):
 	print(t)
 	return signal, len_signal, t
 
-def graphTime(signal, x):
-	plt.plot(x,signal)
+def graphTime(t, signal):
+	plt.plot(t,signal)
 	plt.title("Audio con respecto al tiempo")
 	plt.xlabel("Tiempo [s]")
 	plt.ylabel("Amplitud [dB]")
-	plt.show
+	plt.show()
 
 def fourierTransformation(signal, len_signal):
-	fourierT = fft(signal, len_signal)
-	fourierT_norm = fourierT/len_signal
+	fourierT = fft(signal)
+	fourierNorm = fourierT/len_signal
+	print("FN", fourierNorm)
+	k = arange(len_signal)
+	tiempo = len_signal/rate
+	frq = k/tiempo
+	xfourier = np.fft.fftfreq(len(fourierNorm),1/rate)
+	return xfourier, fourierNorm
 
-	aux = linspace(0.0, 1.0, len_signal/2+1)
-	xfourier = rate/2*aux
-	yfourier = fourierT_norm[0.0: len_signal/2+1]
-	return xfourier, yfourier
+def graphTransformation(xfourier,yfourier):
+    
+	plt.title("Amplitud vs Frecuencia")
+	plt.xlabel("Frecuencia [Hz]")
+	plt.ylabel("Amplitud [dB]")
+	plt.plot(xfourier,abs(yfourier))
+	plt.show()
 
-"""def graficar_transformada_1(xfourier,yfourier):
-    plt.plot(xfourier,abs(yfourier))
-    plt.title("Amplitud respecto a la frecuencia (fft)")
-    plt.xlabel("Frecuencia [Hz]")
+def getInverseFourier(yfourier):
+    fourierTInv = ifft(yfourier)
+    return fourierTInv
+
+def graphWithInverse(time, invFourier):
+	plt.title("Amplitud vs Inversa de Fourier")
+	plt.xlabel("Tiempo[s]")
+	plt.ylabel("Amplitud [dB]")
+	plt.plot(time,invFourier)
+	plt.show()
+
+def getMax(listValues):
+	maxValue = max(listValues)
+	return maxValue
+
+def getIndexValue(value, listValues):
+	for i in range(len(listValues)):
+		if (listValues[i] == value):
+			return i
+
+def removeNoise(maxValue, listFourier):
+	n_amplitude = len(listFourier)
+	fifteen_percent_ampl = n_amplitude*0.075
+	fifteen_percent_ampl = int(fifteen_percent_ampl)
+
+	withoutNoise = np.zeros(n_amplitude)
+	pos = getIndexValue(maxValue,listFourier)
+	min_pos = pos - fifteen_percent_ampl
+	max_pos = pos + fifteen_percent_ampl
+	print("Posicion minima: ", min_pos)
+	print("Posicion maxima: ", max_pos)
+	print(len(listFourier))
+	print(len(withoutNoise))
+	print("Without Noise:", withoutNoise)
+	withoutNoise[min_pos:max_pos] = listFourier[min_pos:max_pos]
+	return withoutNoise
+	
+def graphWithoutNoise(t,inverseWithoutNoise):
+    plt.plot(t,inverseWithoutNoise,"--")
+    plt.title("Audio con respecto al tiempo sin ruido (ifft)")
+    plt.xlabel("Tiempo [s]")
     plt.ylabel("Amplitud [dB]")
-    plt.show
+    plt.show()
 
-def aplicar_inversa_fourier(yfourier,len_signal):
-    fourierTInv = ifft(yfourier*len_signal,len_signal)
-    return inverTransFour
-
-
-dimension = info[0].size
-print(dimension)
-print(info[0])
-#data: datos del audio(arreglo de numpy)
-if(dimension == 1):
-	data =  info
-	perfect = 1
-else:
-	data = info[:,dimension-1]
-	perfect = 0
-
-#timp = tiempo que dura todo el audio
-timp = len(data)/rate
-#print('data: ',data)
-
-t = linspace(0,timp,len(data)) #linspace(start,stop,number)
-#print(len(data))
-#print('timp: ',timp)
-plt.title('Audio')
-plt.xlabel('Tiempo [s]')
-plt.ylabel('Amplitud [dB]')
-plt.plot(t,data)
-plt.show()
-
-
-
-
-large = len(data)
-#print(large)
-k = arange(large)
-#print('k: ',k)
-
-
-T = large/rate
-frq = k/timp
-Y = fft(data)
-
-#print(Y)
-largeY= len(Y)
-y2 = np.fft.fftfreq(largeY,1/rate)
-
-
-#plt.plot(frq,abs(Y))
-#plt.show()
-
-
-otro = ifft(Y) #transformada inversa 
-u = k/otro	
-print(u)
-
-plt.plot(y2, frq)
-plt.show()"""
-
-señal, largo_señal, x = getDatos(info,rate)
+señal, largo_señal, t = getDatos(info,rate)
 xfourier, yfourier = fourierTransformation(señal, largo_señal)
-
+graphTime(t,señal)
+graphTransformation(xfourier,yfourier)
+invFourier = getInverseFourier(yfourier)
+graphWithInverse(t,invFourier)
+max_value = getMax(yfourier)
+without_noise = removeNoise(max_value, yfourier)
+print("WN:",without_noise)
+inv_without_noise = getInverseFourier(without_noise)
+graphWithoutNoise(t, inv_without_noise)
 
 
 
