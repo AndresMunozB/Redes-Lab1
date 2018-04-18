@@ -13,17 +13,17 @@ print(info)
 def getDatos(info,rate):
 	#Datos del audio.
 	signal = info[:,0]
-	print(signal)
+	#print(signal)
 	#Largo de todos los datos.
 	len_signal = len(signal)
 	#Transformado a float.
 	len_signal = float(len_signal)
 	#Duración del audio.
 	time = len_signal/float(rate)
-	print(time)
+	#print(time)
 	#Eje x para el gráfico, de 0 a la duración del audio.
 	t = linspace(0, time, len_signal)
-	print(t)
+	#print(t)
 	return signal, len_signal, t
 
 def graphTime(t, signal):
@@ -36,7 +36,7 @@ def graphTime(t, signal):
 def fourierTransformation(signal, len_signal):
 	fourierT = fft(signal)
 	fourierNorm = fourierT/len_signal
-	print("FN", fourierNorm)
+	#print("FN", fourierNorm)
 	k = arange(len_signal)
 	tiempo = len_signal/rate
 	frq = k/tiempo
@@ -51,8 +51,8 @@ def graphTransformation(xfourier,yfourier):
 	plt.plot(xfourier,abs(yfourier))
 	plt.show()
 
-def getInverseFourier(yfourier):
-    fourierTInv = ifft(yfourier)
+def getInverseFourier(yfourier,len_freq):
+    fourierTInv = ifft(yfourier)*len_freq
     return fourierTInv
 
 def graphWithInverse(time, invFourier):
@@ -63,7 +63,8 @@ def graphWithInverse(time, invFourier):
 	plt.show()
 
 def getMax(listValues):
-	maxValue = max(listValues)
+	maxValue = max(listValues[(len(listValues)/2):-1])
+	print("Maximo: ", maxValue)
 	return maxValue
 
 def getIndexValue(value, listValues):
@@ -73,11 +74,12 @@ def getIndexValue(value, listValues):
 
 def removeNoise(maxValue, listFourier):
 	n_amplitude = len(listFourier)
-	fifteen_percent_ampl = n_amplitude*0.075
+	fifteen_percent_ampl = n_amplitude*0.15
 	fifteen_percent_ampl = int(fifteen_percent_ampl)
 
 	withoutNoise = np.zeros(n_amplitude)
 	pos = getIndexValue(maxValue,listFourier)
+	print("Indice: ", pos)
 	min_pos = pos - fifteen_percent_ampl
 	max_pos = pos + fifteen_percent_ampl
 	print("Posicion minima: ", min_pos)
@@ -99,13 +101,17 @@ señal, largo_señal, t = getDatos(info,rate)
 xfourier, yfourier = fourierTransformation(señal, largo_señal)
 graphTime(t,señal)
 graphTransformation(xfourier,yfourier)
-invFourier = getInverseFourier(yfourier)
+invFourier = getInverseFourier(yfourier,len(xfourier))
 graphWithInverse(t,invFourier)
 max_value = getMax(yfourier)
 without_noise = removeNoise(max_value, yfourier)
+graphTransformation(xfourier,without_noise)
 print("WN:",without_noise)
-inv_without_noise = getInverseFourier(without_noise)
+inv_without_noise = getInverseFourier(without_noise,len(t))
 graphWithoutNoise(t, inv_without_noise)
+
+write("beacon3.wav",rate,invFourier)
+
 
 
 
