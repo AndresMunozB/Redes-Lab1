@@ -132,24 +132,6 @@ while menu != str(6):
 		graphTransformation(xfourier,without_noise)
 	elif(menu == "5"):
 		graphWithoutNoise(t, inv_without_noise)
+		write("beacon3.wav",rate,inv_without_noise)
 	else:
 		print("Opción inválida")
-
-
-
-
-
-		
-
-	
-
-"""
-
-
-
-
-print("WN:",without_noise)
-
-"""
-
-#write("beacon3.wav",rate,inv_without_noise)
