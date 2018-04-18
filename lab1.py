@@ -78,10 +78,10 @@ def removeNoise(maxValue, yfourier):
 	n_amplitude = len(yfourier)
 	n_amplitude = int(n_amplitude/2)
 	
-	print("n_amplitude: ",n_amplitude)
+	#print("n_amplitude: ",n_amplitude)
 	fifteen_percent_ampl = n_amplitude*0.15
 	fifteen_percent_ampl = int(fifteen_percent_ampl)
-	print("fifteen: ", fifteen_percent_ampl)
+	#print("fifteen: ", fifteen_percent_ampl)
 	withoutNoise = np.zeros(n_amplitude*2,np.complex256)
 	pos = getIndexValue(maxValue,yfourier)
 	#print("Indice: ", pos)
@@ -104,7 +104,7 @@ def graphWithoutNoise(t,inverseWithoutNoise):
 
 
 def showMenu():
-	print("    MENU\n\n")
+	print("\n\n    MENU\n\n")
 	print("1) Gráfico del audio original: Amplitud vs Tiempo")
 	print("2) Gráfico de la Transformada de Fourier: Amplitud vs Frecuencia")
 	print("3) Gráfico de la Anti-Transformada fourier : Amplitud vs Tiempo (IFFT) ")
