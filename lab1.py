@@ -5,8 +5,8 @@ from numpy import sin, linspace, pi
 from scipy.io.wavfile import read, write
 from scipy import fft, ifft, arange
 import matplotlib.pyplot as plt
-rate,info = read("beacon.wav")
-print(rate) ##frecuencia de muestreo
+
+#print(rate) ##frecuencia de muestreo
 #print(info)
 
 
@@ -52,8 +52,8 @@ def graphTransformation(xfourier,yfourier):
 	plt.show()
 
 def getInverseFourier(yfourier,len_freq):
-    fourierTInv = ifft(yfourier)*len_freq
-    return fourierTInv
+		fourierTInv = ifft(yfourier)*len_freq
+		return fourierTInv
 
 def graphWithInverse(time, invFourier):
 	plt.title("Amplitud vs Inversa de Fourier")
@@ -63,30 +63,35 @@ def graphWithInverse(time, invFourier):
 	plt.show()
 
 def getMax(yfourier):
-	maxValue = max(yfourier[(len(yfourier)/2):len(yfourier)-1])
-	print("Maximo: ", maxValue)
+	maxValue = max(yfourier)
+	#print("Maximo: ", maxValue)
 	return maxValue
 
 def getIndexValue(value, yfourier):
+	index = 0
 	for i in range(len(yfourier)):
 		if (yfourier[i] == value):
-			return i
+			index = i
+	return i
 
 def removeNoise(maxValue, yfourier):
 	n_amplitude = len(yfourier)
+	n_amplitude = int(n_amplitude/2)
+	
+	print("n_amplitude: ",n_amplitude)
 	fifteen_percent_ampl = n_amplitude*0.15
 	fifteen_percent_ampl = int(fifteen_percent_ampl)
-
-	withoutNoise = np.zeros(n_amplitude)
+	print("fifteen: ", fifteen_percent_ampl)
+	withoutNoise = np.zeros(n_amplitude*2,np.complex256)
 	pos = getIndexValue(maxValue,yfourier)
-	print("Indice: ", pos)
+	#print("Indice: ", pos)
 	min_pos = pos - fifteen_percent_ampl
 	max_pos = pos + fifteen_percent_ampl
-	print("Posicion minima: ", min_pos)
-	print("Posicion maxima: ", max_pos)
-	print(len(yfourier))
-	print(len(withoutNoise))
-	print("Without Noise:", withoutNoise)
+	#print("Posicion minima: ", min_pos)
+	#print("Posicion maxima: ", max_pos)
+	#print(len(yfourier))
+	#print(len(withoutNoise))
+	#print("Without Noise:", withoutNoise)
 	withoutNoise[min_pos:max_pos] = yfourier[min_pos:max_pos]
 	return withoutNoise
 	
@@ -97,17 +102,54 @@ def graphWithoutNoise(t,inverseWithoutNoise):
     plt.ylabel("Amplitud [dB]")
     plt.show()
 
+
+def showMenu():
+	print("    MENU\n\n")
+	print("1) Gráfico del audio original: Amplitud vs Tiempo")
+	print("2) Gráfico de la Transformada de Fourier: Amplitud vs Frecuencia")
+	print("3) Gráfico de la Anti-Transformada fourier : Amplitud vs Tiempo (IFFT) ")
+	print("4) Gráfico de la Tranformada truncado al 15%: Amplitud vs Frecuencia")
+	print("5) Grafico de la Anti-Transformada truncado al 15%: Amplitud vs Frecuencia")
+
+rate,info = read("beacon.wav")
 señal, largo_señal, t = getDatos(info,rate)
 xfourier, yfourier = fourierTransformation(señal, largo_señal)
-graphTime(t,señal)
-graphTransformation(xfourier,yfourier)
 invFourier = getInverseFourier(yfourier,len(xfourier))
-graphWithInverse(t,invFourier)
 max_value = getMax(yfourier)
 without_noise = removeNoise(max_value, yfourier)
-graphTransformation(xfourier,without_noise)
-print("WN:",without_noise)
 inv_without_noise = getInverseFourier(without_noise,len(t))
-graphWithoutNoise(t, inv_without_noise)
+menu = 0
+while menu != str(6):
+	showMenu()
+	menu = input("Ingrese una opción: ")
+	if(menu == "1"):
+		graphTime(t,señal)
+	elif(menu == "2"):
+		graphTransformation(xfourier,yfourier)
+	elif(menu == "3"):
+		graphWithInverse(t,invFourier)
+	elif(menu == "4"):
+		graphTransformation(xfourier,without_noise)
+	elif(menu == "5"):
+		graphWithoutNoise(t, inv_without_noise)
+	else:
+		print("Opción inválida")
+
+
+
+
+
+		
+
+	
+
+"""
+
+
+
+
+print("WN:",without_noise)
+
+"""
 
 #write("beacon3.wav",rate,inv_without_noise)
