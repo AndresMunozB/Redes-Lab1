@@ -7,7 +7,7 @@ from scipy import fft, ifft, arange
 import matplotlib.pyplot as plt
 rate,info = read("beacon.wav")
 print(rate) ##frecuencia de muestreo
-print(info)
+#print(info)
 
 
 def getDatos(info,rate):
@@ -37,9 +37,9 @@ def fourierTransformation(signal, len_signal):
 	fourierT = fft(signal)
 	fourierNorm = fourierT/len_signal
 	#print("FN", fourierNorm)
-	k = arange(len_signal)
+	"""k = arange(len_signal)
 	tiempo = len_signal/rate
-	frq = k/tiempo
+	frq = k/tiempo"""
 	xfourier = np.fft.fftfreq(len(fourierNorm),1/rate)
 	return xfourier, fourierNorm
 
@@ -57,43 +57,43 @@ def getInverseFourier(yfourier,len_freq):
 
 def graphWithInverse(time, invFourier):
 	plt.title("Amplitud vs Inversa de Fourier")
-	plt.xlabel("Tiempo[s]")
+	plt.xlabel("Tiempo[s] (IFFT)")
 	plt.ylabel("Amplitud [dB]")
 	plt.plot(time,invFourier)
 	plt.show()
 
-def getMax(listValues):
-	maxValue = max(listValues[(len(listValues)/2):-1])
+def getMax(yfourier):
+	maxValue = max(yfourier[(len(yfourier)/2):len(yfourier)-1])
 	print("Maximo: ", maxValue)
 	return maxValue
 
-def getIndexValue(value, listValues):
-	for i in range(len(listValues)):
-		if (listValues[i] == value):
+def getIndexValue(value, yfourier):
+	for i in range(len(yfourier)):
+		if (yfourier[i] == value):
 			return i
 
-def removeNoise(maxValue, listFourier):
-	n_amplitude = len(listFourier)
+def removeNoise(maxValue, yfourier):
+	n_amplitude = len(yfourier)
 	fifteen_percent_ampl = n_amplitude*0.15
 	fifteen_percent_ampl = int(fifteen_percent_ampl)
 
 	withoutNoise = np.zeros(n_amplitude)
-	pos = getIndexValue(maxValue,listFourier)
+	pos = getIndexValue(maxValue,yfourier)
 	print("Indice: ", pos)
 	min_pos = pos - fifteen_percent_ampl
 	max_pos = pos + fifteen_percent_ampl
 	print("Posicion minima: ", min_pos)
 	print("Posicion maxima: ", max_pos)
-	print(len(listFourier))
+	print(len(yfourier))
 	print(len(withoutNoise))
 	print("Without Noise:", withoutNoise)
-	withoutNoise[min_pos:max_pos] = listFourier[min_pos:max_pos]
+	withoutNoise[min_pos:max_pos] = yfourier[min_pos:max_pos]
 	return withoutNoise
 	
 def graphWithoutNoise(t,inverseWithoutNoise):
     plt.plot(t,inverseWithoutNoise,"--")
     plt.title("Audio con respecto al tiempo sin ruido (ifft)")
-    plt.xlabel("Tiempo [s]")
+    plt.xlabel("Tiempo [s] (IFFT)")
     plt.ylabel("Amplitud [dB]")
     plt.show()
 
@@ -110,8 +110,4 @@ print("WN:",without_noise)
 inv_without_noise = getInverseFourier(without_noise,len(t))
 graphWithoutNoise(t, inv_without_noise)
 
-write("beacon3.wav",rate,invFourier)
-
-
-
-
+#write("beacon3.wav",rate,inv_without_noise)
