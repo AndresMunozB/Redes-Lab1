@@ -162,6 +162,7 @@ def showMenu():
 	print("   3) Gráfico de la Anti-Transformada fourier : Amplitud vs Tiempo (IFFT) ")
 	print("   4) Gráfico de la Tranformada truncado al 15%: Amplitud vs Frecuencia")
 	print("   5) Grafico de la Anti-Transformada truncado al 15%:Amplitud vs Frecuencia")
+	print("   6) Salir")
 
 rate,info = read("beacon.wav")
 señal, largo_señal, t = getDatos(info,rate)
@@ -173,7 +174,7 @@ inv_without_noise = getInverseFourier(without_noise,len(t))
 menu = 0
 while menu != str(6):
 	showMenu()
-	menu = input("Ingrese una opción: ")
+	menu = input("   Ingrese una opción: ")
 	if(menu == "1"):
 		graphTime(t,señal)
 	elif(menu == "2"):
@@ -185,5 +186,7 @@ while menu != str(6):
 	elif(menu == "5"):
 		graphWithoutNoise(t, inv_without_noise)
 		write("beacon2.wav",rate,inv_without_noise.astype(info.dtype))
+	elif(menu == "6"):
+		exit
 	else:
-		print("Opción inválida")
+		print("   ERROR: Opción inválida")
